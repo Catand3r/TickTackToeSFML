@@ -1,5 +1,16 @@
+#pragma once
 #include <iostream>
 #include <array>
+#include "SFML/Graphics.hpp"
+#include <optional>
+
+using X = std::array<sf::RectangleShape, 2>;
+
+enum class Mode
+{
+    single = 0,
+    multi
+};
 
 enum class Turn : bool
 {
@@ -19,9 +30,21 @@ using Cells = std::array<std::array<State, 3>, 3>;
 class TicTacToe
 {
 public:
-    Turn turn_;
+    TicTacToe() = default; // only for tests - todo: delete it
+    TicTacToe(Mode);
     void NextTurn();
-    Cells cells_;
     void SetEmptyCells();
     bool AreAllCellsNotEmpty();
+    void ProcessTurn(const int, const int);
+    std::optional<sf::RectangleShape> CreateWinLine();
+    void Draw(sf::RenderWindow &);
+    bool IsPlayerTurn() const;
+    bool IsComputerTurn() const;
+
+private:
+    std::optional<sf::RectangleShape> checkDiagonalWinCondition(State);
+    std::optional<sf::RectangleShape> checkRowOrColumnWinCondition(State);
+    Cells cells_;
+    Turn turn_ = Turn::circle;
+    Mode mode_ = Mode::multi;
 };

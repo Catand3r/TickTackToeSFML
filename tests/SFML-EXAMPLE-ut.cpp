@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
+#define private public
 #include "TicTacToe.h"
+
 
 using Cells = std::array<std::array<State, 3>, 3>;
 
@@ -32,11 +34,11 @@ TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenSetEmptyCellsIsCalledThencells
 TEST(SFMLExampleTests, GivenTicTacToeAndturn_WhenNextTurnIsCalledThenturn_IsEqualToTurncircle)
 {
     TicTacToe ttt;
-    EXPECT_EQ(ttt.turn_, Turn::cross);
-    ttt.NextTurn();
     EXPECT_EQ(ttt.turn_, Turn::circle);
     ttt.NextTurn();
     EXPECT_EQ(ttt.turn_, Turn::cross);
+    ttt.NextTurn();
+    EXPECT_EQ(ttt.turn_, Turn::circle);
 }
 
 TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenIsAnyCellEmptyIsCalledThencells_IsNotEqualToemptyCells)
