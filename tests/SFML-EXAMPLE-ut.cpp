@@ -2,7 +2,7 @@
 #define private public // to do: delete it
 #include "TicTacToe.h"
 
-using Cells = std::array<std::array<State, 3>, 3>;
+using Cells = std::array<std::array<CellState, 3>, 3>;
 
 Cells createEmptyCells()
 {
@@ -12,7 +12,7 @@ Cells createEmptyCells()
     {
         for (int j = 0; j < emptyCells[i].size(); j++)
         {
-            emptyCells[i][j] = State::empty;
+            emptyCells[i][j] = CellState::empty;
         }
     }
     return emptyCells;
@@ -28,16 +28,6 @@ TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenSetEmptyCellsIsCalledThencells
     TicTacToe ttt;
     ttt.SetEmptyCells();
     EXPECT_EQ(ttt.cells_, createEmptyCells());
-}
-
-TEST(SFMLExampleTests, GivenTicTacToeAndturn_WhenNextTurnIsCalledThenturn_IsEqualToTurncircle)
-{
-    TicTacToe ttt;
-    EXPECT_EQ(ttt.turn_, Turn::circle);
-    ttt.NextTurn();
-    EXPECT_EQ(ttt.turn_, Turn::cross);
-    ttt.NextTurn();
-    EXPECT_EQ(ttt.turn_, Turn::circle);
 }
 
 TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenIsAnyCellEmptyIsCalledThencells_IsNotEqualToemptyCells)

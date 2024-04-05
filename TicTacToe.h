@@ -6,6 +6,16 @@
 
 using X = std::array<sf::RectangleShape, 2>;
 
+using Lines = std::array<sf::RectangleShape, 4>;
+
+enum class GameState
+{
+    firstPlayer = 0,
+    secondPlayer,
+    win,
+    gameDraw
+};
+
 enum class Mode
 {
     single = 0,
@@ -18,20 +28,21 @@ enum class Turn : bool
     circle = 1
 };
 
-enum class State
+enum class CellState
 {
     empty = 0,
     circle, // 1
     cross   // 2
 };
 
-using Cells = std::array<std::array<State, 3>, 3>;
+using Cells = std::array<std::array<CellState, 3>, 3>;
 
 class TicTacToe
 {
 public:
     TicTacToe() = default; // only for tests - todo: delete it
     TicTacToe(Mode);
+    void Run(sf::RenderWindow &, Lines);
     void NextTurn();
     void SetEmptyCells();
     bool AreAllCellsNotEmpty();
@@ -44,9 +55,12 @@ public:
     std::pair<int, int> ComputerMove();
 
 private:
-    std::optional<sf::RectangleShape> checkDiagonalWinCondition(State);
-    std::optional<sf::RectangleShape> checkRowOrColumnWinCondition(State);
+    std::optional<sf::RectangleShape> checkDiagonalWinCondition(CellState);
+    std::optional<sf::RectangleShape> checkRowOrColumnWinCondition(CellState);
     Cells cells_;
     Turn turn_ = Turn::circle;
     Mode mode_ = Mode::multi;
+    GameState gstate_ = GameState::firstPlayer;
+    void RunGameState(sf::Event, sf::RenderWindow &);
+    std::optional<sf::RectangleShape> winLine_;
 };
