@@ -6,6 +6,8 @@
 #include <optional>
 #include "TicTacToe.h"
 #include "utils.h"
+#include <cstdlib>
+#include <ctime>
 
 using Lines = std::array<sf::RectangleShape, 4>;
 
@@ -28,14 +30,34 @@ void Run(sf::RenderWindow &window, Lines &lines, Mode mode)
             // ([[IsPlayerMove() and IsButtonClicked()] or [IsComputerMove] and !winLine.has_value()])
             {
                 std::cout << "Enter MouseButtonReleased\n";
-                ttt.NextTurn();
+                // ttt.NextTurn();
+                //  row i column wyliczane na podstawie sf::Mouse to jest obsługa specyficzna tylko dla gracza!
+                /*
+                jeżeli jest runda gracza - robisz tak jak teraz: row i column bierzesz z myszki
+                jeżeli jest runda komputera - tworzysz sobie funkcje, która oblicza które pole ma zająć komputer
+                szukasz czy masz gdzieś 1 pole do zwycięstwa, jak tak no to wybierasz
+                szukasz czy masz gdzieś 1 pole zajęte i opcję zwycięstwa, wtedy wybierasz tą ścieżkę
+                jak nie to możesz losować spośród wolnych pól
+                algorytm minmax dla zapewnienia braku porażki
 
-                const int cellWidth = window.getSize().x / 3;
-                const int cellHeight = window.getSize().y / 3;
+                może pojawić się problem z rundami - w razie czego warto dopisać kilka linijek logu który będzie printował kto kiedy jaką rundę ma
+                */
+                if (ttt.IsPlayerTurn())
+                {
+                    const int cellWidth = window.getSize().x / 3;
+                    const int cellHeight = window.getSize().y / 3;
 
-                row = sf::Mouse::getPosition(window).y / cellHeight;
+                    row = sf::Mouse::getPosition(window).y / cellHeight;
 
-                column = sf::Mouse::getPosition(window).x / cellWidth;
+                    column = sf::Mouse::getPosition(window).x / cellWidth;
+
+                    std::cout << "Player row: " << row << "column: " << column << "\n";
+                }
+                else if (ttt.IsComputerTurn())
+                {
+                    std::tie(row, column) = ttt.ComputerMove();
+                    std::cout << "Computer row: " << row << "column: " << column << "\n";
+                }
 
                 if (column < 0 || column > 2 || row < 0 || row > 2)
                     break;

@@ -4,10 +4,13 @@
 #include "SFML/Graphics.hpp"
 #include "utils.h"
 #include <optional>
+#include <cstdlib>
+#include <ctime>
 
 TicTacToe::TicTacToe(Mode mode)
 {
     mode_ = mode;
+    std::srand(std::time(nullptr));
 }
 
 void TicTacToe::NextTurn()
@@ -15,6 +18,15 @@ void TicTacToe::NextTurn()
     bool turnB = static_cast<bool>(turn_);
     turnB = !turnB;
     turn_ = static_cast<Turn>(turnB);
+
+    if (turn_ == Turn::circle)
+    {
+        std::cout << "turn: circle\n";
+    }
+    else
+    {
+        std::cout << "turn: cross\n";
+    }
 }
 
 void TicTacToe::SetEmptyCells()
@@ -41,9 +53,6 @@ void TicTacToe::ProcessTurn(const int row, const int column)
     if (cells_[row][column] == State::empty)
     {
         cells_[row][column] = turn_ == Turn::circle ? State::circle : State::cross;
-    }
-    else
-    {
         NextTurn();
     }
 }
@@ -98,6 +107,11 @@ std::optional<sf::RectangleShape> TicTacToe::CreateWinLine()
             }
         }
     }
+    if (!winLine.has_value() && AreAllCellsNotEmpty())
+    {
+        winLine = utils::CreateLine(0, 0, 0, 0.0, 0.0);
+    }
+
     return winLine;
 }
 
@@ -132,4 +146,79 @@ bool TicTacToe::IsPlayerTurn() const
 bool TicTacToe::IsComputerTurn() const
 {
     return mode_ == Mode::single && turn_ == Turn::cross;
+}
+
+bool TicTacToe::IsCellEmpty(int row, int column)
+{
+    return cells_[row][column] == State::empty;
+}
+
+std::pair<int, int> TicTacToe::ComputerMove()
+{
+    if (cells_[0][0] == State::cross && cells_[1][1] == State::cross && cells_[2][2] == State::empty)
+    {
+        return {2, 2};
+    }
+    else if (cells_[0][0] == State::cross && cells_[1][1] == State::empty && cells_[2][2] == State::cross)
+    {
+        return {1, 1};
+    }
+    else if (cells_[0][0] == State::empty && cells_[1][1] == State::cross && cells_[2][2] == State::cross)
+    {
+        return {0, 0};
+    }
+    else if (cells_[0][2] == State::cross && cells_[1][1] == State::cross && cells_[2][0] == State::empty)
+    {
+        return {2, 0};
+    }
+    else if (cells_[0][2] == State::cross && cells_[1][1] == State::empty && cells_[2][0] == State::cross)
+    {
+        return {1, 1};
+    }
+    else if (cells_[0][2] == State::empty && cells_[1][1] == State::cross && cells_[2][0] == State::cross)
+    {
+        return {0, 2};
+    }
+
+    for (int i = 0; i < cells_.size(); i++)
+    {
+        if (cells_[i][0] == State::cross && cells_[i][1] == State::cross && cells_[i][2] == State::empty)
+        {
+            return {i, 2};
+        }
+        else if (cells_[i][0] == State::cross && cells_[i][1] == State::empty && cells_[i][2] == State::cross)
+        {
+            return {i, 1};
+        }
+        else if (cells_[i][0] == State::empty && cells_[i][1] == State::cross && cells_[i][2] == State::cross)
+        {
+            return {i, 2};
+        }
+        // for (int j = 0; j < cells_[i].size(); j++)
+        //{
+
+        if (cells_[0][i] == State::cross && cells_[1][i] == State::cross && cells_[2][i] == State::empty)
+        {
+            return {2, i};
+        }
+        else if (cells_[0][i] == State::cross && cells_[1][i] == State::empty && cells_[2][i] == State::cross)
+        {
+            return {1, i};
+        }
+        else if (cells_[0][i] == State::empty && cells_[1][i] == State::cross && cells_[2][i] == State::cross)
+        {
+            return {0, i};
+        }
+        //}
+    }
+
+    int randomRow = std::rand() % 3;
+    int randomColumn = std::rand() % 3;
+    while (!IsCellEmpty(randomRow, randomColumn))
+    {
+        std::cout << "In while()\n";
+        randomRow = std::rand() % 3;
+        randomColumn = std::rand() % 3;
+    }
+    return {randomRow, randomColumn};
 }

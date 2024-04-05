@@ -40,6 +40,8 @@ public:
     void Draw(sf::RenderWindow &);
     bool IsPlayerTurn() const;
     bool IsComputerTurn() const;
+    bool IsCellEmpty(int, int);
+    std::pair<int, int> ComputerMove();
 
 private:
     std::optional<sf::RectangleShape> checkDiagonalWinCondition(State);

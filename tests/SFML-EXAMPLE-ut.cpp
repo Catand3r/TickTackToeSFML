@@ -1,7 +1,6 @@
 #include "gtest/gtest.h"
-#define private public
+#define private public // to do: delete it
 #include "TicTacToe.h"
-
 
 using Cells = std::array<std::array<State, 3>, 3>;
 
