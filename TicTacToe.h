@@ -37,30 +37,47 @@ enum class CellState
 
 using Cells = std::array<std::array<CellState, 3>, 3>;
 
-class TicTacToe
+class ITicTacToe
 {
 public:
-    TicTacToe() = default; // only for tests - todo: delete it
-    TicTacToe(Mode);
-    void Run(sf::RenderWindow &, Lines);
-    void NextTurn();
-    void SetEmptyCells();
-    bool AreAllCellsNotEmpty();
+    void Run();
+    ITicTacToe(); // only for tests - todo: delete it
+    virtual ~ITicTacToe() = default;
+
+protected:
     void ProcessTurn(const int, const int);
     std::optional<sf::RectangleShape> CreateWinLine();
-    void Draw(sf::RenderWindow &);
-    bool IsPlayerTurn() const;
-    bool IsComputerTurn() const;
-    bool IsCellEmpty(int, int);
     std::pair<int, int> ComputerMove();
-
-private:
-    std::optional<sf::RectangleShape> checkDiagonalWinCondition(CellState);
-    std::optional<sf::RectangleShape> checkRowOrColumnWinCondition(CellState);
-    Cells cells_;
-    Turn turn_ = Turn::circle;
-    Mode mode_ = Mode::multi;
-    GameState gstate_ = GameState::firstPlayer;
-    void RunGameState(sf::Event, sf::RenderWindow &);
+    std::pair<int, int> HumanPlayerMove();
+    std::optional<sf::RectangleShape> checkDiagonalWinCondition(CellState) const;
+    std::optional<sf::RectangleShape> checkRowOrColumnWinCondition(CellState) const;
+    void Draw();
+    bool IsCellEmpty(int, int);
+    void SetEmptyCells();
+    bool IsAnyCellEmpty() const;
+    bool IsGameWon() const;
+    void RunGameState(sf::Event);
+    virtual void firstPlayer(sf::Event) = 0;
+    virtual void secondPlayer(sf::Event) = 0;
+    void endGame();
+    sf::RenderWindow window_;
     std::optional<sf::RectangleShape> winLine_;
+    Cells cells_;
+    GameState gstate_ = GameState::firstPlayer;
+    Turn turn_ = Turn::circle;
+    Lines lines_;
+};
+
+class SingleModeTicTacToe : public ITicTacToe
+{
+private:
+    void firstPlayer(sf::Event) override;
+    void secondPlayer(sf::Event) override;
+};
+
+class MultiModeTicTacToe : public ITicTacToe
+{
+private:
+    void firstPlayer(sf::Event) override;
+    void secondPlayer(sf::Event) override;
 };

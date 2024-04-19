@@ -53,23 +53,21 @@ void Run()
 
 int main()
 {
-    TicTacToe ttt;
-    sf::RenderWindow window(sf::VideoMode(200, 200), "Kolko i krzyzyk");
-    Lines lines{utils::CreateLine(66, 0, 90), utils::CreateLine(132, 0, 90), utils::CreateLine(0, 66, 0), utils::CreateLine(0, 132, 0)};
-    std::cout << "isOpen" << window.isOpen() << '\n';
+    ITicTacToe *ttt = nullptr;
     std::cout << "Choose mode(singleplayer(computer), multiplayer): \n";
     std::string modestr;
-    Mode mode;
     std::cin >> modestr;
-    if (modestr == "singleplayer")
+    if (modestr == "single")
     {
-        mode = Mode::single;
+        ttt = new SingleModeTicTacToe();
     }
-    else if (modestr == "multiplayer")
+    else if (modestr == "multi")
     {
-        mode = Mode::multi;
+        ttt = new MultiModeTicTacToe();
     }
-    ttt.Run(window, lines);
+
+    ttt->Run();
+    delete ttt;
     std::cout << "\nexit\n";
     return 0;
 }

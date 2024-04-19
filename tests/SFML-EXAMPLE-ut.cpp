@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
-#define private public // to do: delete it
+#define protected public // to do: delete it
 #include "TicTacToe.h"
 
 using Cells = std::array<std::array<CellState, 3>, 3>;
 
 Cells createEmptyCells()
 {
-    TicTacToe ttt;
+    SingleModeTicTacToe ttt;
     Cells emptyCells;
     for (int i = 0; i < emptyCells.size(); i++)
     {
@@ -25,14 +25,14 @@ TEST(SFMLExampleTests, AlwaysTrue)
 
 TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenSetEmptyCellsIsCalledThencells_IsEqualToemptyCells)
 {
-    TicTacToe ttt;
+    SingleModeTicTacToe ttt;
     ttt.SetEmptyCells();
     EXPECT_EQ(ttt.cells_, createEmptyCells());
 }
 
 TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenIsAnyCellEmptyIsCalledThencells_IsNotEqualToemptyCells)
 {
-    TicTacToe ttt;
+    SingleModeTicTacToe ttt;
     ttt.SetEmptyCells();
-    EXPECT_EQ(ttt.AreAllCellsNotEmpty(), false);
+    EXPECT_EQ(ttt.IsAnyCellEmpty(), true);
 }
