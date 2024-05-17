@@ -13,6 +13,7 @@ target_link_libraries(SFML_EXAMPLE
     /Users/paulziemann/Library/SFML/lib/libsfml-system.2.6.1.dylib
     /Users/paulziemann/Library/SFML/lib/libsfml-window.2.6.1.dylib
     /Users/paulziemann/Library/SFML/lib/libsfml-graphics.2.6.1.dylib
+    /Users/paulziemann/Library/SFML/lib/libsfml-network.2.6.1.dylib
 )
 
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -46,6 +47,7 @@ target_link_libraries(${PROJECT_NAME}-ut PUBLIC gtest_main
     /Users/paulziemann/Library/SFML/lib/libsfml-system.2.6.1.dylib
     /Users/paulziemann/Library/SFML/lib/libsfml-window.2.6.1.dylib
     /Users/paulziemann/Library/SFML/lib/libsfml-graphics.2.6.1.dylib
+    /Users/paulziemann/Library/SFML/lib/libsfml-network.2.6.1.dylib
 )
 
 add_test(NAME SFMLExampleTests COMMAND ${PROJECT_NAME}-ut)

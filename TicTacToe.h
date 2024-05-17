@@ -2,7 +2,9 @@
 #include <iostream>
 #include <array>
 #include "SFML/Graphics.hpp"
+#include "SFML/Network.hpp"
 #include <optional>
+#include <string>
 
 using X = std::array<sf::RectangleShape, 2>;
 
@@ -57,6 +59,7 @@ protected:
     bool IsAnyCellEmpty() const;
     bool IsGameWon() const;
     void RunGameState(sf::Event);
+    virtual std::string GetWindowTitle();
     virtual void firstPlayer(sf::Event) = 0;
     virtual void secondPlayer(sf::Event) = 0;
     void endGame();
@@ -71,6 +74,7 @@ protected:
 class SingleModeTicTacToe : public ITicTacToe
 {
 private:
+    std::string GetWindowTitle() override;
     void firstPlayer(sf::Event) override;
     void secondPlayer(sf::Event) override;
 };
@@ -78,6 +82,29 @@ private:
 class MultiModeTicTacToe : public ITicTacToe
 {
 private:
+    std::string GetWindowTitle() override;
     void firstPlayer(sf::Event) override;
     void secondPlayer(sf::Event) override;
+};
+
+class OnlineModeTicTacToe : public ITicTacToe
+{
+public:
+    OnlineModeTicTacToe(std::string, std::string, int);
+
+private:
+    std::string GetWindowTitle() override;
+    void Send(int, int);
+    std::optional<sf::Packet> Recieve();
+    void firstPlayer(sf::Event) override;
+    void secondPlayer(sf::Event) override;
+    void clientTurn(sf::Event);
+    void serverTurn();
+    void Network();
+    void Connect(std::string, int);
+    void Listen(int);
+    sf::TcpSocket socket_;
+    std::string port;
+    int ip;
+    std::string networkMode_;
 };

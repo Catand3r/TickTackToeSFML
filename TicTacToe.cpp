@@ -2,17 +2,23 @@
 #include <array>
 #include "TicTacToe.h"
 #include "SFML/Graphics.hpp"
+#include "SFML/Network.hpp"
 #include "utils.h"
 #include <optional>
 #include <cstdlib>
 #include <ctime>
 
 ITicTacToe::ITicTacToe() : lines_({utils::CreateLine(66, 0, 90), utils::CreateLine(132, 0, 90), utils::CreateLine(0, 66, 0), utils::CreateLine(0, 132, 0)}),
-                           window_(sf::VideoMode(200, 200), "Kolko i krzyzyk")
+                           window_(sf::VideoMode(200, 200), GetWindowTitle())
 
 {
     std::srand(std::time(nullptr));
     SetEmptyCells();
+}
+
+std::string ITicTacToe::GetWindowTitle()
+{
+    return "ITicTacToe";
 }
 
 void ITicTacToe::Run()
@@ -321,6 +327,11 @@ void SingleModeTicTacToe::secondPlayer(sf::Event)
     ProcessTurn(row, column);
 }
 
+std::string SingleModeTicTacToe::GetWindowTitle()
+{
+    return "Singleplayer Tic Tac Toe";
+}
+
 void MultiModeTicTacToe::firstPlayer(sf::Event event)
 {
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
@@ -345,4 +356,172 @@ void MultiModeTicTacToe::secondPlayer(sf::Event event)
         std::cout << "Player row: " << row << "column: " << column << "\n";
         ProcessTurn(row, column);
     }
+}
+
+std::string MultiModeTicTacToe::GetWindowTitle()
+{
+    return "Multiplayer Tic Tac Toe";
+}
+
+OnlineModeTicTacToe::OnlineModeTicTacToe(std::string networkchoice, std::string ip, int port) : networkMode_(networkchoice)
+{
+    if (networkchoice == "c")
+    {
+        Connect(ip, port);
+        sf::sleep(sf::seconds(1));
+    }
+    else if (networkchoice == "s")
+    {
+        Listen(port);
+    }
+}
+
+void OnlineModeTicTacToe::Connect(std::string ip, int port)
+{
+    sf::Socket::Status status = socket_.connect(ip, port);
+    if (status != sf::Socket::Done)
+    {
+        sf::Clock clock;
+        while (status != sf::Socket::Done)
+        {
+            if (clock.getElapsedTime().asSeconds() >= 2)
+            {
+                status = socket_.connect(ip, port);
+                std::cout << "Socket nie podłączony\n";
+                clock.restart();
+            }
+        }
+    }
+    std::cout << "Socket podłączony\n";
+    sf::SocketSelector selector;
+    selector.add(socket_);
+
+    // while (true)
+    // {
+    //     if (selector.wait(sf::milliseconds(100)))
+    //     {
+    //         if (selector.isReady(socket))
+    //         {
+    //             Recieve(socket);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         Send(socket, row, column);
+    //     }
+    // }
+}
+
+void OnlineModeTicTacToe::Listen(int port)
+{
+    sf::TcpListener listener;
+
+    // bind the listener to a port
+    if (listener.listen(port) != sf::Socket::Done)
+    {
+        // error...
+    }
+
+    // accept a new connection
+    if (listener.accept(socket_) != sf::Socket::Done)
+    {
+        // error...
+    }
+}
+
+void OnlineModeTicTacToe::clientTurn(sf::Event event)
+{
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
+    {
+        auto [row, column] = HumanPlayerMove();
+
+        std::cout << "Enter MouseButtonReleased\n";
+
+        std::cout << "Player row: " << row << "column: " << column << "\n";
+        ProcessTurn(row, column);
+        Send(row, column);
+    }
+}
+
+void OnlineModeTicTacToe::serverTurn()
+{
+    std::optional<sf::Packet> recievePacket = Recieve();
+    if (recievePacket.has_value())
+    {
+        int row, column;
+        *recievePacket >> row >> column;
+        std::cout << "Odebrane row: " << row << ", odebrane column: " << column << "\n";
+        ProcessTurn(row, column);
+    }
+}
+
+void OnlineModeTicTacToe::Send(int row, int column)
+{
+    sf::Packet sendPacket;
+    std::cout << "Wysłany row: " << row << ", wysłany column: " << column << "\n";
+    sendPacket << row << column;
+    if (socket_.send(sendPacket) != sf::Socket::Done)
+    {
+        // error ...
+    }
+}
+
+std::optional<sf::Packet> OnlineModeTicTacToe::Recieve()
+{
+    sf::SocketSelector selector;
+    selector.add(socket_);
+    if (selector.wait(sf::milliseconds(100)))
+    {
+        if (selector.isReady(socket_))
+        {
+            sf::Packet recievedPacket;
+            if (socket_.receive(recievedPacket) != sf::Socket::Done)
+            {
+                // error ...
+            }
+            else
+            {
+                return recievedPacket;
+            }
+            return std::nullopt;
+        }
+    }
+    return std::nullopt;
+}
+
+void OnlineModeTicTacToe::firstPlayer(sf::Event event)
+{
+    if (networkMode_ == "c")
+    {
+        clientTurn(event);
+    }
+    else if (networkMode_ == "s")
+    {
+        serverTurn();
+    }
+}
+
+void OnlineModeTicTacToe::secondPlayer(sf::Event event)
+{
+    if (networkMode_ == "c")
+    {
+        serverTurn();
+    }
+    else if (networkMode_ == "s")
+    {
+        clientTurn(event);
+    }
+}
+
+std::string OnlineModeTicTacToe::GetWindowTitle()
+{
+    if (networkMode_ == "c")
+    {
+        return "Online TicTacToe (client)";
+    }
+    else if (networkMode_ == "s")
+    {
+        return "Online TicTacToe (server)";
+    }
+    return "";
 }
