@@ -5,6 +5,7 @@
 #include <string>
 #include <optional>
 #include "TicTacToe.h"
+#include "OnlineTicTacToe.h"
 #include "utils.h"
 #include <cstdlib>
 #include <ctime>

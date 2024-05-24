@@ -51,18 +51,18 @@ protected:
     std::optional<sf::RectangleShape> CreateWinLine();
     std::pair<int, int> ComputerMove();
     std::pair<int, int> HumanPlayerMove();
-    std::optional<sf::RectangleShape> checkDiagonalWinCondition(CellState) const;
-    std::optional<sf::RectangleShape> checkRowOrColumnWinCondition(CellState) const;
-    void Draw();
+    std::optional<sf::RectangleShape> CheckDiagonalWinCondition(CellState) const;
+    std::optional<sf::RectangleShape> CheckRowOrColumnWinCondition(CellState) const;
     bool IsCellEmpty(int, int);
-    void SetEmptyCells();
     bool IsAnyCellEmpty() const;
     bool IsGameWon() const;
+    void Draw();
+    void SetEmptyCells();
     void RunGameState(sf::Event);
-    virtual std::string GetWindowTitle();
-    virtual void firstPlayer(sf::Event) = 0;
-    virtual void secondPlayer(sf::Event) = 0;
-    void endGame();
+    void EndGame();
+    virtual void SetWindowTitle();
+    virtual void FirstPlayer(sf::Event) = 0;
+    virtual void SecondPlayer(sf::Event) = 0;
     sf::RenderWindow window_;
     std::optional<sf::RectangleShape> winLine_;
     Cells cells_;
@@ -74,37 +74,15 @@ protected:
 class SingleModeTicTacToe : public ITicTacToe
 {
 private:
-    std::string GetWindowTitle() override;
-    void firstPlayer(sf::Event) override;
-    void secondPlayer(sf::Event) override;
+    void SetWindowTitle() override;
+    void FirstPlayer(sf::Event) override;
+    void SecondPlayer(sf::Event) override;
 };
 
 class MultiModeTicTacToe : public ITicTacToe
 {
 private:
-    std::string GetWindowTitle() override;
-    void firstPlayer(sf::Event) override;
-    void secondPlayer(sf::Event) override;
-};
-
-class OnlineModeTicTacToe : public ITicTacToe
-{
-public:
-    OnlineModeTicTacToe(std::string, std::string, int);
-
-private:
-    std::string GetWindowTitle() override;
-    void Send(int, int);
-    std::optional<sf::Packet> Recieve();
-    void firstPlayer(sf::Event) override;
-    void secondPlayer(sf::Event) override;
-    void clientTurn(sf::Event);
-    void serverTurn();
-    void Network();
-    void Connect(std::string, int);
-    void Listen(int);
-    sf::TcpSocket socket_;
-    std::string port;
-    int ip;
-    std::string networkMode_;
+    void SetWindowTitle() override;
+    void FirstPlayer(sf::Event) override;
+    void SecondPlayer(sf::Event) override;
 };

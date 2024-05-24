@@ -1,6 +1,7 @@
 #include <iostream>
 #include <array>
 #include "TicTacToe.h"
+#include "OnlineTicTacToe.h"
 #include "SFML/Graphics.hpp"
 #include "SFML/Network.hpp"
 #include "utils.h"
@@ -8,21 +9,24 @@
 #include <cstdlib>
 #include <ctime>
 
+// ITicTacToe
+
 ITicTacToe::ITicTacToe() : lines_({utils::CreateLine(66, 0, 90), utils::CreateLine(132, 0, 90), utils::CreateLine(0, 66, 0), utils::CreateLine(0, 132, 0)}),
-                           window_(sf::VideoMode(200, 200), GetWindowTitle())
+                           window_(sf::VideoMode(200, 200), "")
 
 {
     std::srand(std::time(nullptr));
     SetEmptyCells();
 }
 
-std::string ITicTacToe::GetWindowTitle()
+void ITicTacToe::SetWindowTitle()
 {
-    return "ITicTacToe";
+    window_.setTitle("ITicTacToe");
 }
 
 void ITicTacToe::Run()
 {
+    SetWindowTitle();
     while (window_.isOpen())
     {
         sf::Event event;
@@ -42,19 +46,19 @@ void ITicTacToe::RunGameState(sf::Event event)
     {
     case GameState::firstPlayer:
     {
-        firstPlayer(event);
+        FirstPlayer(event);
         break;
     }
     case GameState::secondPlayer:
     {
-        secondPlayer(event);
+        SecondPlayer(event);
         break;
     }
 
     case GameState::gameDraw:
     case GameState::win:
     {
-        endGame();
+        EndGame();
         break;
     }
     }
@@ -170,7 +174,7 @@ std::pair<int, int> ITicTacToe::ComputerMove()
     return {randomRow, randomColumn};
 }
 
-void ITicTacToe::endGame()
+void ITicTacToe::EndGame()
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
     {
@@ -183,13 +187,13 @@ void ITicTacToe::endGame()
 
 bool ITicTacToe::IsGameWon() const
 {
-    return checkDiagonalWinCondition(CellState::cross) ||
-           checkRowOrColumnWinCondition(CellState::cross) ||
-           checkDiagonalWinCondition(CellState::circle) ||
-           checkRowOrColumnWinCondition(CellState::circle);
+    return CheckDiagonalWinCondition(CellState::cross) ||
+           CheckRowOrColumnWinCondition(CellState::cross) ||
+           CheckDiagonalWinCondition(CellState::circle) ||
+           CheckRowOrColumnWinCondition(CellState::circle);
 }
 
-std::optional<sf::RectangleShape> ITicTacToe::checkDiagonalWinCondition(CellState state) const
+std::optional<sf::RectangleShape> ITicTacToe::CheckDiagonalWinCondition(CellState state) const
 {
     if (cells_[0][0] == state && cells_[1][1] == state && cells_[2][2] == state)
     {
@@ -203,7 +207,7 @@ std::optional<sf::RectangleShape> ITicTacToe::checkDiagonalWinCondition(CellStat
     return std::nullopt;
 }
 
-std::optional<sf::RectangleShape> ITicTacToe::checkRowOrColumnWinCondition(CellState state) const
+std::optional<sf::RectangleShape> ITicTacToe::CheckRowOrColumnWinCondition(CellState state) const
 {
     for (int i = 0; i < cells_.size(); i++)
     {
@@ -226,16 +230,16 @@ std::optional<sf::RectangleShape> ITicTacToe::checkRowOrColumnWinCondition(CellS
 
 std::optional<sf::RectangleShape> ITicTacToe::CreateWinLine()
 {
-    std::optional<sf::RectangleShape> winLine = checkDiagonalWinCondition(CellState::circle);
+    std::optional<sf::RectangleShape> winLine = CheckDiagonalWinCondition(CellState::circle);
     if (!winLine.has_value())
     {
-        winLine = checkDiagonalWinCondition(CellState::cross);
+        winLine = CheckDiagonalWinCondition(CellState::cross);
         if (!winLine.has_value())
         {
-            winLine = checkRowOrColumnWinCondition(CellState::circle);
+            winLine = CheckRowOrColumnWinCondition(CellState::circle);
             if (!winLine.has_value())
             {
-                winLine = checkRowOrColumnWinCondition(CellState::cross);
+                winLine = CheckRowOrColumnWinCondition(CellState::cross);
             }
         }
     }
@@ -307,7 +311,9 @@ bool ITicTacToe::IsCellEmpty(int row, int column)
     return cells_[row][column] == CellState::empty;
 }
 
-void SingleModeTicTacToe::firstPlayer(sf::Event event)
+// SingleModeTicTacToe
+
+void SingleModeTicTacToe::FirstPlayer(sf::Event event)
 {
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
     {
@@ -320,32 +326,21 @@ void SingleModeTicTacToe::firstPlayer(sf::Event event)
     }
 }
 
-void SingleModeTicTacToe::secondPlayer(sf::Event)
+void SingleModeTicTacToe::SecondPlayer(sf::Event)
 {
     auto [row, column] = ComputerMove();
     std::cout << "Computer row: " << row << "column: " << column << "\n";
     ProcessTurn(row, column);
 }
 
-std::string SingleModeTicTacToe::GetWindowTitle()
+void SingleModeTicTacToe::SetWindowTitle()
 {
-    return "Singleplayer Tic Tac Toe";
+    window_.setTitle("Singleplayer TicTacToe");
 }
 
-void MultiModeTicTacToe::firstPlayer(sf::Event event)
-{
-    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
-    {
-        auto [row, column] = HumanPlayerMove();
+// MultiModeTicTacToe
 
-        std::cout << "Enter MouseButtonReleased\n";
-
-        std::cout << "Player row: " << row << "column: " << column << "\n";
-        ProcessTurn(row, column);
-    }
-}
-
-void MultiModeTicTacToe::secondPlayer(sf::Event event)
+void MultiModeTicTacToe::FirstPlayer(sf::Event event)
 {
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
     {
@@ -358,12 +353,28 @@ void MultiModeTicTacToe::secondPlayer(sf::Event event)
     }
 }
 
-std::string MultiModeTicTacToe::GetWindowTitle()
+void MultiModeTicTacToe::SecondPlayer(sf::Event event)
 {
-    return "Multiplayer Tic Tac Toe";
+    if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
+    {
+        auto [row, column] = HumanPlayerMove();
+
+        std::cout << "Enter MouseButtonReleased\n";
+
+        std::cout << "Player row: " << row << "column: " << column << "\n";
+        ProcessTurn(row, column);
+    }
 }
 
-OnlineModeTicTacToe::OnlineModeTicTacToe(std::string networkchoice, std::string ip, int port) : networkMode_(networkchoice)
+void MultiModeTicTacToe::SetWindowTitle()
+{
+    window_.setTitle("Multiplayer TicTacToe");
+}
+
+// OnlineModeTicTacToe
+
+OnlineModeTicTacToe::OnlineModeTicTacToe(std::string networkchoice, std::string ip, int port) : networkMode_(networkchoice),
+                                                                                                seqNum_(0)
 {
     if (networkchoice == "c")
     {
@@ -395,21 +406,6 @@ void OnlineModeTicTacToe::Connect(std::string ip, int port)
     std::cout << "Socket podłączony\n";
     sf::SocketSelector selector;
     selector.add(socket_);
-
-    // while (true)
-    // {
-    //     if (selector.wait(sf::milliseconds(100)))
-    //     {
-    //         if (selector.isReady(socket))
-    //         {
-    //             Recieve(socket);
-    //         }
-    //     }
-    //     else
-    //     {
-    //         Send(socket, row, column);
-    //     }
-    // }
 }
 
 void OnlineModeTicTacToe::Listen(int port)
@@ -434,7 +430,6 @@ void OnlineModeTicTacToe::clientTurn(sf::Event event)
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
     {
         auto [row, column] = HumanPlayerMove();
-
         std::cout << "Enter MouseButtonReleased\n";
 
         std::cout << "Player row: " << row << "column: " << column << "\n";
@@ -448,22 +443,27 @@ void OnlineModeTicTacToe::serverTurn()
     std::optional<sf::Packet> recievePacket = Recieve();
     if (recievePacket.has_value())
     {
-        int row, column;
-        *recievePacket >> row >> column;
-        std::cout << "Odebrane row: " << row << ", odebrane column: " << column << "\n";
-        ProcessTurn(row, column);
+        int row, column, seqNum;
+        *recievePacket >> seqNum >> row >> column;
+        std::cout << "Odebrane numer: " << seqNum << ", row: " << row << ", odebrane column: " << column << "\n";
+        if (seqNum == seqNum_)
+        {
+            ProcessTurn(row, column);
+            seqNum_++;
+        }
     }
 }
 
 void OnlineModeTicTacToe::Send(int row, int column)
 {
     sf::Packet sendPacket;
-    std::cout << "Wysłany row: " << row << ", wysłany column: " << column << "\n";
-    sendPacket << row << column;
+    std::cout << "Wysłany numer: " << seqNum_ << ", row: " << row << ", wysłany column: " << column << "\n";
+    sendPacket << seqNum_ << row << column;
     if (socket_.send(sendPacket) != sf::Socket::Done)
     {
         // error ...
     }
+    seqNum_++;
 }
 
 std::optional<sf::Packet> OnlineModeTicTacToe::Recieve()
@@ -489,7 +489,7 @@ std::optional<sf::Packet> OnlineModeTicTacToe::Recieve()
     return std::nullopt;
 }
 
-void OnlineModeTicTacToe::firstPlayer(sf::Event event)
+void OnlineModeTicTacToe::FirstPlayer(sf::Event event)
 {
     if (networkMode_ == "c")
     {
@@ -501,7 +501,7 @@ void OnlineModeTicTacToe::firstPlayer(sf::Event event)
     }
 }
 
-void OnlineModeTicTacToe::secondPlayer(sf::Event event)
+void OnlineModeTicTacToe::SecondPlayer(sf::Event event)
 {
     if (networkMode_ == "c")
     {
@@ -513,15 +513,18 @@ void OnlineModeTicTacToe::secondPlayer(sf::Event event)
     }
 }
 
-std::string OnlineModeTicTacToe::GetWindowTitle()
+void OnlineModeTicTacToe::SetWindowTitle()
 {
     if (networkMode_ == "c")
     {
-        return "Online TicTacToe (client)";
+        window_.setTitle("Online TicTacToe (client)");
     }
     else if (networkMode_ == "s")
     {
-        return "Online TicTacToe (server)";
+        window_.setTitle("Online TicTacToe (server)");
     }
-    return "";
+    else
+    {
+        window_.setTitle("Online TicTacToe");
+    }
 }
