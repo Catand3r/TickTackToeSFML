@@ -8,7 +8,7 @@
 
 using X = std::array<sf::RectangleShape, 2>;
 
-using Lines = std::array<sf::RectangleShape, 4>;
+using Lines = std::array<sf::RectangleShape, 6>;
 
 enum class GameState
 {
@@ -49,7 +49,6 @@ public:
 protected:
     void ProcessTurn(const int, const int);
     std::optional<sf::RectangleShape> CreateWinLine();
-    std::pair<int, int> ComputerMove();
     std::pair<int, int> HumanPlayerMove();
     std::optional<sf::RectangleShape> CheckDiagonalWinCondition(CellState) const;
     std::optional<sf::RectangleShape> CheckRowOrColumnWinCondition(CellState) const;
@@ -60,6 +59,11 @@ protected:
     void SetEmptyCells();
     void RunGameState(sf::Event);
     void EndGame();
+    void SetFont();
+    void SetTurnText();
+    void SetClockText();
+    void UpdateTurnText(std::string);
+    void UpdateClockText();
     virtual void SetWindowTitle();
     virtual void FirstPlayer(sf::Event) = 0;
     virtual void SecondPlayer(sf::Event) = 0;
@@ -69,11 +73,22 @@ protected:
     GameState gstate_ = GameState::firstPlayer;
     Turn turn_ = Turn::circle;
     Lines lines_;
+    sf::Font font_;
+    sf::Text turnText_;
+    sf::Clock clock_;
+    sf::Text clockText_;
 };
 
 class SingleModeTicTacToe : public ITicTacToe
 {
+public:
+    SingleModeTicTacToe(std::string);
+
 private:
+    std::string diffstr_;
+    std::pair<int, int> ComputerMove();
+    std::pair<int, int> BestComputerMove();
+    int MiniMax();
     void SetWindowTitle() override;
     void FirstPlayer(sf::Event) override;
     void SecondPlayer(sf::Event) override;

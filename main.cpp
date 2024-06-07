@@ -60,7 +60,17 @@ int main()
     std::cin >> modestr;
     if (modestr == "single")
     {
-        ttt = new SingleModeTicTacToe();
+        std::cout << "Choose difficulty(normal (random), hard (minimax))";
+        std::string diffstr;
+        std::cin >> diffstr;
+        if (diffstr == "normal")
+        {
+            ttt = new SingleModeTicTacToe(diffstr);
+        }
+        else if (diffstr == "hard")
+        {
+            ttt = new SingleModeTicTacToe(diffstr);
+        }
     }
     else if (modestr == "multi")
     {

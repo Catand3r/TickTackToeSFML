@@ -8,20 +8,58 @@
 #include <optional>
 #include <cstdlib>
 #include <ctime>
+#include <limits>
 
 // ITicTacToe
 
-ITicTacToe::ITicTacToe() : lines_({utils::CreateLine(66, 0, 90), utils::CreateLine(132, 0, 90), utils::CreateLine(0, 66, 0), utils::CreateLine(0, 132, 0)}),
-                           window_(sf::VideoMode(200, 200), "")
+ITicTacToe::ITicTacToe() : lines_({utils::CreateLine(66, 0, 90), utils::CreateLine(132, 0, 90), utils::CreateLine(0, 66, 0), utils::CreateLine(0, 132, 0), utils::CreateLine(0, 200, 0), utils::CreateLine(200, 0, 90)}),
+                           window_(sf::VideoMode(300, 300), "")
 
 {
     std::srand(std::time(nullptr));
     SetEmptyCells();
+    SetFont();
+    SetTurnText();
+    SetClockText();
 }
 
 void ITicTacToe::SetWindowTitle()
 {
     window_.setTitle("ITicTacToe");
+}
+
+void ITicTacToe::SetFont()
+{
+    font_.loadFromFile("../Arial.ttf");
+}
+
+void ITicTacToe::SetTurnText()
+{
+    turnText_.setPosition(100, 250);
+    turnText_.setFont(font_);
+    turnText_.setCharacterSize(24);
+    turnText_.setFillColor(sf::Color::White);
+}
+
+void ITicTacToe::SetClockText()
+{
+    clockText_.setPosition(200, 250);
+    clockText_.setFont(font_);
+    clockText_.setCharacterSize(24);
+    clockText_.setFillColor(sf::Color::White);
+}
+
+void ITicTacToe::UpdateClockText()
+{
+    sf::Time currentTime = clock_.getElapsedTime();
+    int currentTimeInt = currentTime.asSeconds();
+    std::string currentTimeString = std::to_string(currentTimeInt);
+    clockText_.setString(currentTimeString);
+}
+
+void ITicTacToe::UpdateTurnText(std::string string)
+{
+    turnText_.setString(string);
 }
 
 void ITicTacToe::Run()
@@ -35,6 +73,7 @@ void ITicTacToe::Run()
         if (event.type == sf::Event::Closed)
             window_.close();
 
+        UpdateClockText();
         RunGameState(event);
         Draw();
     }
@@ -95,83 +134,13 @@ void ITicTacToe::ProcessTurn(const int row, const int column)
 
 std::pair<int, int> ITicTacToe::HumanPlayerMove()
 {
-    const int cellWidth = window_.getSize().x / 3;
-    const int cellHeight = window_.getSize().y / 3;
+    const int cellWidth = 200 / 3;  // hardcoded
+    const int cellHeight = 200 / 3; // hardcoded
 
     const int row = sf::Mouse::getPosition(window_).y / cellHeight;
     const int column = sf::Mouse::getPosition(window_).x / cellWidth;
 
     return {row, column};
-}
-
-std::pair<int, int> ITicTacToe::ComputerMove()
-{
-    if (cells_[0][0] == CellState::cross && cells_[1][1] == CellState::cross && cells_[2][2] == CellState::empty)
-    {
-        return {2, 2};
-    }
-    else if (cells_[0][0] == CellState::cross && cells_[1][1] == CellState::empty && cells_[2][2] == CellState::cross)
-    {
-        return {1, 1};
-    }
-    else if (cells_[0][0] == CellState::empty && cells_[1][1] == CellState::cross && cells_[2][2] == CellState::cross)
-    {
-        return {0, 0};
-    }
-    else if (cells_[0][2] == CellState::cross && cells_[1][1] == CellState::cross && cells_[2][0] == CellState::empty)
-    {
-        return {2, 0};
-    }
-    else if (cells_[0][2] == CellState::cross && cells_[1][1] == CellState::empty && cells_[2][0] == CellState::cross)
-    {
-        return {1, 1};
-    }
-    else if (cells_[0][2] == CellState::empty && cells_[1][1] == CellState::cross && cells_[2][0] == CellState::cross)
-    {
-        return {0, 2};
-    }
-
-    for (int i = 0; i < cells_.size(); i++)
-    {
-        if (cells_[i][0] == CellState::cross && cells_[i][1] == CellState::cross && cells_[i][2] == CellState::empty)
-        {
-            return {i, 2};
-        }
-        else if (cells_[i][0] == CellState::cross && cells_[i][1] == CellState::empty && cells_[i][2] == CellState::cross)
-        {
-            return {i, 1};
-        }
-        else if (cells_[i][0] == CellState::empty && cells_[i][1] == CellState::cross && cells_[i][2] == CellState::cross)
-        {
-            return {i, 2};
-        }
-        // for (int j = 0; j < cells_[i].size(); j++)
-        //{
-
-        if (cells_[0][i] == CellState::cross && cells_[1][i] == CellState::cross && cells_[2][i] == CellState::empty)
-        {
-            return {2, i};
-        }
-        else if (cells_[0][i] == CellState::cross && cells_[1][i] == CellState::empty && cells_[2][i] == CellState::cross)
-        {
-            return {1, i};
-        }
-        else if (cells_[0][i] == CellState::empty && cells_[1][i] == CellState::cross && cells_[2][i] == CellState::cross)
-        {
-            return {0, i};
-        }
-        //}
-    }
-
-    int randomRow = std::rand() % 3;
-    int randomColumn = std::rand() % 3;
-    while (!IsCellEmpty(randomRow, randomColumn))
-    {
-        std::cout << "In while()\n";
-        randomRow = std::rand() % 3;
-        randomColumn = std::rand() % 3;
-    }
-    return {randomRow, randomColumn};
 }
 
 void ITicTacToe::EndGame()
@@ -279,6 +248,9 @@ void ITicTacToe::Draw()
         window_.draw(line);
     }
 
+    window_.draw(turnText_);
+    window_.draw(clockText_);
+
     if (winLine_.has_value())
     {
         window_.draw(winLine_.value());
@@ -313,8 +285,13 @@ bool ITicTacToe::IsCellEmpty(int row, int column)
 
 // SingleModeTicTacToe
 
+SingleModeTicTacToe::SingleModeTicTacToe(std::string diffstr) : diffstr_(diffstr)
+{
+}
+
 void SingleModeTicTacToe::FirstPlayer(sf::Event event)
 {
+    UpdateTurnText("Circle");
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
     {
         auto [row, column] = HumanPlayerMove();
@@ -328,9 +305,118 @@ void SingleModeTicTacToe::FirstPlayer(sf::Event event)
 
 void SingleModeTicTacToe::SecondPlayer(sf::Event)
 {
+    UpdateTurnText("Cross");
     auto [row, column] = ComputerMove();
     std::cout << "Computer row: " << row << "column: " << column << "\n";
     ProcessTurn(row, column);
+}
+
+std::pair<int, int> SingleModeTicTacToe::ComputerMove()
+{
+    if (diffstr_ == "normal")
+    {
+        if (cells_[0][0] == CellState::cross && cells_[1][1] == CellState::cross && cells_[2][2] == CellState::empty)
+        {
+            return {2, 2};
+        }
+        else if (cells_[0][0] == CellState::cross && cells_[1][1] == CellState::empty && cells_[2][2] == CellState::cross)
+        {
+            return {1, 1};
+        }
+        else if (cells_[0][0] == CellState::empty && cells_[1][1] == CellState::cross && cells_[2][2] == CellState::cross)
+        {
+            return {0, 0};
+        }
+        else if (cells_[0][2] == CellState::cross && cells_[1][1] == CellState::cross && cells_[2][0] == CellState::empty)
+        {
+            return {2, 0};
+        }
+        else if (cells_[0][2] == CellState::cross && cells_[1][1] == CellState::empty && cells_[2][0] == CellState::cross)
+        {
+            return {1, 1};
+        }
+        else if (cells_[0][2] == CellState::empty && cells_[1][1] == CellState::cross && cells_[2][0] == CellState::cross)
+        {
+            return {0, 2};
+        }
+
+        for (int i = 0; i < cells_.size(); i++)
+        {
+            if (cells_[i][0] == CellState::cross && cells_[i][1] == CellState::cross && cells_[i][2] == CellState::empty)
+            {
+                return {i, 2};
+            }
+            else if (cells_[i][0] == CellState::cross && cells_[i][1] == CellState::empty && cells_[i][2] == CellState::cross)
+            {
+                return {i, 1};
+            }
+            else if (cells_[i][0] == CellState::empty && cells_[i][1] == CellState::cross && cells_[i][2] == CellState::cross)
+            {
+                return {i, 2};
+            }
+            // for (int j = 0; j < cells_[i].size(); j++)
+            //{
+
+            if (cells_[0][i] == CellState::cross && cells_[1][i] == CellState::cross && cells_[2][i] == CellState::empty)
+            {
+                return {2, i};
+            }
+            else if (cells_[0][i] == CellState::cross && cells_[1][i] == CellState::empty && cells_[2][i] == CellState::cross)
+            {
+                return {1, i};
+            }
+            else if (cells_[0][i] == CellState::empty && cells_[1][i] == CellState::cross && cells_[2][i] == CellState::cross)
+            {
+                return {0, i};
+            }
+            //}
+        }
+
+        int randomRow = std::rand() % 3;
+        int randomColumn = std::rand() % 3;
+        while (!IsCellEmpty(randomRow, randomColumn))
+        {
+            std::cout << "In while()\n";
+            randomRow = std::rand() % 3;
+            randomColumn = std::rand() % 3;
+        }
+        return {randomRow, randomColumn};
+    }
+    else if (diffstr_ == "hard")
+    {
+        return {0, 0};
+    }
+    return {0, 0};
+}
+
+std::pair<int, int> SingleModeTicTacToe::BestComputerMove()
+{
+    int bestScore = std::numeric_limits<int>::min();
+    std::pair<int, int> bestMove;
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            if (cells_[i][j] == CellState::empty)
+            {
+                int score = MiniMax();
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestMove = {i, j};
+                    return {0, 0};
+                }
+                return {i, j};
+            }
+            return {0, 0};
+        }
+    }
+    return {0, 0};
+}
+
+int SingleModeTicTacToe::MiniMax()
+{
+    return 0;
 }
 
 void SingleModeTicTacToe::SetWindowTitle()
@@ -342,6 +428,7 @@ void SingleModeTicTacToe::SetWindowTitle()
 
 void MultiModeTicTacToe::FirstPlayer(sf::Event event)
 {
+    UpdateTurnText("Circle");
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
     {
         auto [row, column] = HumanPlayerMove();
@@ -355,6 +442,7 @@ void MultiModeTicTacToe::FirstPlayer(sf::Event event)
 
 void MultiModeTicTacToe::SecondPlayer(sf::Event event)
 {
+    UpdateTurnText("Cross");
     if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
     {
         auto [row, column] = HumanPlayerMove();
@@ -491,6 +579,7 @@ std::optional<sf::Packet> OnlineModeTicTacToe::Recieve()
 
 void OnlineModeTicTacToe::FirstPlayer(sf::Event event)
 {
+    UpdateTurnText("Circle");
     if (networkMode_ == "c")
     {
         clientTurn(event);
@@ -503,6 +592,7 @@ void OnlineModeTicTacToe::FirstPlayer(sf::Event event)
 
 void OnlineModeTicTacToe::SecondPlayer(sf::Event event)
 {
+    UpdateTurnText("Cross");
     if (networkMode_ == "c")
     {
         serverTurn();

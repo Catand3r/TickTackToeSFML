@@ -6,7 +6,7 @@ using Cells = std::array<std::array<CellState, 3>, 3>;
 
 Cells createEmptyCells()
 {
-    SingleModeTicTacToe ttt;
+    SingleModeTicTacToe ttt("normal");
     Cells emptyCells;
     for (int i = 0; i < emptyCells.size(); i++)
     {
@@ -25,14 +25,14 @@ TEST(SFMLExampleTests, AlwaysTrue)
 
 TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenSetEmptyCellsIsCalledThencells_IsEqualToemptyCells)
 {
-    SingleModeTicTacToe ttt;
+    SingleModeTicTacToe ttt("normal");
     ttt.SetEmptyCells();
     EXPECT_EQ(ttt.cells_, createEmptyCells());
 }
 
 TEST(SFMLExampleTests, GivenTicTacToeAndcells_WhenIsAnyCellEmptyIsCalledThencells_IsNotEqualToemptyCells)
 {
-    SingleModeTicTacToe ttt;
+    SingleModeTicTacToe ttt("normal");
     ttt.SetEmptyCells();
     EXPECT_EQ(ttt.IsAnyCellEmpty(), true);
 }
