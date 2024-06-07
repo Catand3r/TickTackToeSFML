@@ -55,6 +55,8 @@ protected:
     bool IsCellEmpty(int, int);
     bool IsAnyCellEmpty() const;
     bool IsGameWon() const;
+    bool CrossWon() const;
+    bool CircleWon() const;
     void Draw();
     void SetEmptyCells();
     void RunGameState(sf::Event);
@@ -88,7 +90,7 @@ private:
     std::string diffstr_;
     std::pair<int, int> ComputerMove();
     std::pair<int, int> BestComputerMove();
-    int MiniMax();
+    int MiniMax(Turn);
     void SetWindowTitle() override;
     void FirstPlayer(sf::Event) override;
     void SecondPlayer(sf::Event) override;
