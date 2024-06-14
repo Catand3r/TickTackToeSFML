@@ -12,8 +12,17 @@
 
 // ITicTacToe
 
-ITicTacToe::ITicTacToe() : lines_({utils::CreateLine(66, 0, 90), utils::CreateLine(132, 0, 90), utils::CreateLine(0, 66, 0), utils::CreateLine(0, 132, 0), utils::CreateLine(0, 200, 0), utils::CreateLine(200, 0, 90)}),
-                           window_(sf::VideoMode(300, 300), "")
+ITicTacToe::ITicTacToe() : window_(sf::VideoMode(500, 500), ""),
+                           boardWidth_(0.66 * window_.getSize().x),
+                           boardHeight_(0.66 * window_.getSize().y),
+                           cellWidth_(0.33 * boardWidth_),
+                           cellHeight_(0.33 * boardHeight_),
+                           lines_({utils::CreateLine(0.22 * window_.getSize().x, 0, 90, boardWidth_),
+                                   utils::CreateLine(0.44 * window_.getSize().x, 0, 90, boardWidth_),
+                                   utils::CreateLine(0, 0.22 * window_.getSize().y, 0, boardHeight_),
+                                   utils::CreateLine(0, 0.44 * window_.getSize().x, 0, boardHeight_),
+                                   utils::CreateLine(0, 0.66 * window_.getSize().y, 0, boardHeight_),
+                                   utils::CreateLine(0.66 * window_.getSize().x, 0, 90, boardWidth_)})
 
 {
     std::srand(std::time(nullptr));
@@ -30,22 +39,22 @@ void ITicTacToe::SetWindowTitle()
 
 void ITicTacToe::SetFont()
 {
-    font_.loadFromFile("../Arial.ttf");
+    font_.loadFromFile("../Fonts/Arial.ttf");
 }
 
 void ITicTacToe::SetTurnText()
 {
-    turnText_.setPosition(100, 250);
+    turnText_.setPosition(0.33 * window_.getSize().x, 0.83 * window_.getSize().y);
     turnText_.setFont(font_);
-    turnText_.setCharacterSize(24);
+    turnText_.setCharacterSize(0.08 * window_.getSize().x);
     turnText_.setFillColor(sf::Color::White);
 }
 
 void ITicTacToe::SetClockText()
 {
-    clockText_.setPosition(200, 250);
+    clockText_.setPosition(0.66 * window_.getSize().x, 0.83 * window_.getSize().y);
     clockText_.setFont(font_);
-    clockText_.setCharacterSize(24);
+    clockText_.setCharacterSize(0.08 * window_.getSize().x);
     clockText_.setFillColor(sf::Color::White);
 }
 
@@ -137,11 +146,11 @@ void ITicTacToe::ProcessTurn(const int row, const int column)
 
 std::pair<int, int> ITicTacToe::HumanPlayerMove()
 {
-    const int cellWidth = 200 / 3;  // hardcoded
-    const int cellHeight = 200 / 3; // hardcoded
+    const int cellH = 0.66 * window_.getSize().y / 3;
+    const int cellW = 0.66 * window_.getSize().x / 3;
 
-    const int row = sf::Mouse::getPosition(window_).y / cellHeight;
-    const int column = sf::Mouse::getPosition(window_).x / cellWidth;
+    const int row = sf::Mouse::getPosition(window_).y / cellH;
+    const int column = sf::Mouse::getPosition(window_).x / cellW;
 
     return {row, column};
 }
@@ -177,11 +186,11 @@ std::optional<sf::RectangleShape> ITicTacToe::CheckDiagonalWinCondition(CellStat
 {
     if (cells_[0][0] == state && cells_[1][1] == state && cells_[2][2] == state)
     {
-        return utils::CreateLine(0, 0, 45, 282.8, 5.0, sf::Color::Red); // todo hardcoded
+        return utils::CreateLine(0, 0, 45, boardWidth_ * 1.41, 5.0, sf::Color::Red);
     }
     else if (cells_[2][0] == state && cells_[1][1] == state && cells_[0][2] == state)
     {
-        return utils::CreateLine(200, 0, 135, 282.8, 5.0, sf::Color::Red); // todo hardcoded
+        return utils::CreateLine(boardWidth_, 0, 135, boardHeight_ * 1.41, 5.0, sf::Color::Red);
     }
 
     return std::nullopt;
@@ -193,14 +202,14 @@ std::optional<sf::RectangleShape> ITicTacToe::CheckRowOrColumnWinCondition(CellS
     {
         if (cells_[i][0] == state && cells_[i][1] == state && cells_[i][2] == state)
         {
-            return utils::CreateLine(0, i * 66 + 33, 0, 200.0, 5.0, sf::Color::Red);
+            return utils::CreateLine(0, i * cellWidth_ + 0.5 * cellWidth_, 0, boardWidth_, 5.0, sf::Color::Red);
         }
         for (int j = 0; j < cells_[i].size(); j++)
         {
 
             if (cells_[0][j] == state && cells_[1][j] == state && cells_[2][j] == state)
             {
-                return utils::CreateLine(j * 66 + 33, 0, 90, 200.0, 5.0, sf::Color::Red);
+                return utils::CreateLine(j * cellHeight_ + 0.5 * cellHeight_, 0, 90, boardHeight_, 5.0, sf::Color::Red);
             }
         }
     }
@@ -240,12 +249,20 @@ void ITicTacToe::Draw()
         {
             if (cells_[i][j] == CellState::circle)
             {
-                sf::CircleShape circle = utils::CreateCircle(j * 66, i * 66);
+                const int xPos = j * 0.33 * boardWidth_;
+                const int yPos = i * 0.33 * boardHeight_;
+                const int radius = 0.5 * cellWidth_;
+                sf::CircleShape circle = utils::CreateCircle(xPos, yPos, radius);
                 window_.draw(circle);
             }
             else if (cells_[i][j] == CellState::cross)
             {
-                X x{utils::CreateLine(j * 66, i * 66, 45, 84.0, 3.0), utils::CreateLine(j * 66, i * 66 + 60, -45, 84.0, 3.0)};
+                const int xPos = j * 0.33 * boardWidth_;
+                const int yPos = i * 0.33 * boardHeight_;
+                const int length = cellHeight_ * 1.41;
+                const int width = 0.045 * cellWidth_;
+                X x{utils::CreateLine(xPos, yPos, 45, length, width),
+                    utils::CreateLine(xPos + cellWidth_, yPos, 135, length, width)};
                 for (const auto &line : x)
                 {
                     window_.draw(line);

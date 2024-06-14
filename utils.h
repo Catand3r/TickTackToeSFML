@@ -13,9 +13,9 @@ namespace utils
         return line;
     }
 
-    static sf::CircleShape CreateCircle(int x, int y)
+    static sf::CircleShape CreateCircle(int x, int y, float c = 30.f)
     {
-        sf::CircleShape circle(30.f);
+        sf::CircleShape circle(c);
         circle.setPosition(x, y);
         return circle;
     }

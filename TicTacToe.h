@@ -70,15 +70,19 @@ protected:
     virtual void FirstPlayer(sf::Event) = 0;
     virtual void SecondPlayer(sf::Event) = 0;
     sf::RenderWindow window_;
-    std::optional<sf::RectangleShape> winLine_;
-    Cells cells_;
-    GameState gstate_ = GameState::firstPlayer;
-    Turn turn_ = Turn::circle;
+    const int boardWidth_;
+    const int boardHeight_;
+    const int cellWidth_;
+    const int cellHeight_;
     Lines lines_;
+    Cells cells_;
     sf::Font font_;
     sf::Text turnText_;
     sf::Clock clock_;
     sf::Text clockText_;
+    std::optional<sf::RectangleShape> winLine_;
+    GameState gstate_ = GameState::firstPlayer;
+    Turn turn_ = Turn::circle;
 };
 
 class SingleModeTicTacToe : public ITicTacToe
