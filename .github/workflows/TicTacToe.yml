@@ -1,0 +1,27 @@
+name: C CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: makeBuild
+      working-directory: .
+      run: mkdir build
+    - name: CMake generation
+      working-directory: .
+      run: cd build && cmake ..
+    - name: Compilation
+      working-directory: .
+      run: cd build && make
+    - name: runTests
+      working-directory: .
+      run: cd build && ctest -V
