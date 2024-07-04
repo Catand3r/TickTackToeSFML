@@ -5,16 +5,15 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(./)
+link_directories(./lib)
 
 add_executable(SFML_EXAMPLE main.cpp TicTacToe.cpp)
 
-
-
 target_link_libraries(SFML_EXAMPLE
-    ./lib/libsfml-system.2.6.1.dylib
-    ./lib/libsfml-window.2.6.1.dylib
-    ./lib/libsfml-graphics.2.6.1.dylib
-    ./lib/libsfml-network.2.6.1.dylib
+    libsfml-system.2.6.1.dylib
+    libsfml-window.2.6.1.dylib
+    libsfml-graphics.2.6.1.dylib
+    libsfml-network.2.6.1.dylib
 )
 
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -45,10 +44,10 @@ target_compile_options(${PROJECT_NAME} PRIVATE ${FLAGS})
 add_executable(${PROJECT_NAME}-ut tests/SFML-EXAMPLE-ut.cpp TicTacToe.cpp)
 target_compile_options(${PROJECT_NAME}-ut PRIVATE ${FLAGS})
 target_link_libraries(${PROJECT_NAME}-ut PUBLIC gtest_main
-    /Users/paulziemann/Library/SFML/lib/libsfml-system.2.6.1.dylib
-    /Users/paulziemann/Library/SFML/lib/libsfml-window.2.6.1.dylib
-    /Users/paulziemann/Library/SFML/lib/libsfml-graphics.2.6.1.dylib
-    /Users/paulziemann/Library/SFML/lib/libsfml-network.2.6.1.dylib
+    libsfml-system.2.6.1.dylib
+    libsfml-window.2.6.1.dylib
+    libsfml-graphics.2.6.1.dylib
+    libsfml-network.2.6.1.dylib
 )
 
 add_test(NAME SFMLExampleTests COMMAND ${PROJECT_NAME}-ut)
