@@ -19,13 +19,17 @@ jobs:
     - name: CMake generation
       working-directory: .
       run: cd build && cmake ..
-    - name: Compilation
-      working-directory: .
-      run: cd lib && ls && cd .. && cd build && make
-    - name: runTests
-      working-directory: .
-      run: cd build && ctest -V
       shell: bash
       env:
        CC: clang
        CXX: clang
+    - name: Compilation
+      working-directory: .
+      run: cd lib && ls && cd .. && cd build && make
+      shell: bash
+      env:
+       CC: clang
+       CXX: clang
+    - name: runTests
+      working-directory: .
+      run: cd build && ctest -V
