@@ -11,10 +11,10 @@ add_executable(SFML_EXAMPLE main.cpp TicTacToe.cpp)
 
 
 target_link_libraries(SFML_EXAMPLE
-    /Users/paulziemann/Library/SFML/lib/libsfml-system.2.6.1.dylib
-    /Users/paulziemann/Library/SFML/lib/libsfml-window.2.6.1.dylib
-    /Users/paulziemann/Library/SFML/lib/libsfml-graphics.2.6.1.dylib
-    /Users/paulziemann/Library/SFML/lib/libsfml-network.2.6.1.dylib
+    ./lib/libsfml-system.2.6.1.dylib
+    ./lib/libsfml-window.2.6.1.dylib
+    ./lib/libsfml-graphics.2.6.1.dylib
+    ./lib/libsfml-network.2.6.1.dylib
 )
 
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
