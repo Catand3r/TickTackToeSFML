@@ -21,7 +21,7 @@ jobs:
       run: cd build && cmake ..
     - name: Compilation
       working-directory: .
-      run: cd build && make
+      run: ls && cd build && make
     - name: runTests
       working-directory: .
       run: cd build && ctest -V
