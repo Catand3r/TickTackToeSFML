@@ -25,3 +25,7 @@ jobs:
     - name: runTests
       working-directory: .
       run: cd build && ctest -V
+      shell: bash
+      env:
+       CC: clang
+       CXX: clang
