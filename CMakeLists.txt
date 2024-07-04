@@ -5,6 +5,8 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS -I"/Users/paulziemann/Documents/C++ Projects/SFML Example/")
 
+include_directories(SFML)
+
 add_executable(SFML_EXAMPLE main.cpp TicTacToe.cpp)
 
 

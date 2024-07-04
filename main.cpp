@@ -6,7 +6,7 @@
 int main()
 {
     ITicTacToe *ttt = nullptr;
-    std::cout << "Choose mode(singleplayer(computer), multiplayer): \n";
+    std::cout << "Choose mode(singleplayer(computer), multiplayer, online): \n";
     std::string modestr;
     std::cin >> modestr;
     if (modestr == "single")
