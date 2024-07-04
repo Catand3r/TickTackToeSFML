@@ -13,6 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Permissions
+      working-directory: .
+      run: chmod -R 777 lib
     - name: makeBuild
       working-directory: .
       run: mkdir build
