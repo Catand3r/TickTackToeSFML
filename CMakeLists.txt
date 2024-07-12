@@ -52,10 +52,10 @@ target_compile_options(${PROJECT_NAME} PRIVATE ${FLAGS})
 add_executable(${PROJECT_NAME}-ut tests/SFML-EXAMPLE-ut.cpp TicTacToe.cpp)
 target_compile_options(${PROJECT_NAME}-ut PRIVATE ${FLAGS})
 target_link_libraries(${PROJECT_NAME}-ut PUBLIC gtest_main
-    libsfml-system.2.6.1.dylib
-    libsfml-window.2.6.1.dylib
-    libsfml-graphics.2.6.1.dylib
-    libsfml-network.2.6.1.dylib
+    libsfml-system.so.2.6.1
+    libsfml-window.so.2.6.1
+    libsfml-graphics.so.2.6.1
+    libsfml-network.so.2.6.1
 )
 
 add_test(NAME SFMLExampleTests COMMAND ${PROJECT_NAME}-ut)
