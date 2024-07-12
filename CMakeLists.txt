@@ -5,16 +5,24 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(./)
-link_directories(./lib)
+link_directories(./lib/Linux)
+
 
 add_executable(SFML_EXAMPLE main.cpp TicTacToe.cpp)
 
 target_link_libraries(SFML_EXAMPLE
-    libsfml-system.2.6.1.dylib
-    libsfml-window.2.6.1.dylib
-    libsfml-graphics.2.6.1.dylib
-    libsfml-network.2.6.1.dylib
+    libsfml-system.so.2.6.1
+    libsfml-window.so.2.6.1
+    libsfml-graphics.so.2.6.1
+    libsfml-network.so.2.6.1
 )
+
+# target_link_libraries(SFML_EXAMPLE
+#     libsfml-system.2.6.1.dylib
+#     libsfml-window.2.6.1.dylib
+#     libsfml-graphics.2.6.1.dylib
+#     libsfml-network.2.6.1.dylib
+# )
 
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
